@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+
+    "name": "Project Flow",
+
+    "version": "1.0",
+
+    "description": "Automatic form autofill extension",
+
+    "permissions": [
+        "storage"
+    ],
+
+    "action": {
+        "default_popup": "popup.html"
+    },
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "content_scripts": [
+        {
+            "matches": [
+                "http://127.0.0.1:5500/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Flow</title>
+
+    <style>
+        body {
+            width: 320px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #message {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Project Flow</h2>
+
+    <label>First Name</label>
+    <input type="text" id="firstName">
+
+    <label>Last Name</label>
+    <input type="text" id="lastName">
+
+    <label>Email</label>
+    <input type="email" id="email">
+
+    <label>Phone</label>
+    <input type="text" id="phone">
+
+    <label>Address</label>
+    <textarea id="address"></textarea>
+
+    <label>City</label>
+    <input type="text" id="city">
+
+    <label>State</label>
+    <input type="text" id="state">
+
+    <label>Pincode</label>
+    <input type="text" id="pincode">
+
+    <label>LinkedIn</label>
+    <input type="text" id="linkedin">
+
+    <label>GitHub</label>
+    <input type="text" id="github">
+
+
+
+
+
+
+<label>Gender</label>
+
+<select id="gender">
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
+
+
+<label>Experience</label>
+
+<select id="experience">
+    <option value="">Select Experience</option>
+    <option value="0">0 Years</option>
+    <option value="1">1 Year</option>
+    <option value="2">2 Years</option>
+    <option value="3">3 Years</option>
+</select>
+
+
+<label>Notice Period</label>
+
+<select id="noticePeriod">
+    <option value="">Select Notice Period</option>
+    <option value="Immediate">Immediate</option>
+    <option value="15">15 Days</option>
+    <option value="30">30 Days</option>
+    <option value="60">60 Days</option>
+</select>
+
+
+<label>Willing to Relocate</label>
+
+<select id="relocate">
+    <option value="">Select</option>
+    <option value="Yes">Yes</option>
+    <option value="No">No</option>
+</select>
+
+
+<label>
+    <input type="checkbox" id="terms">
+    Agree to Terms
+</label>
+    <button id="saveBtn">Save Profile</button>
+
+    <p id="message"></p>
+
+    <script src="popup.js"></script>
+
+</body>
+</html>

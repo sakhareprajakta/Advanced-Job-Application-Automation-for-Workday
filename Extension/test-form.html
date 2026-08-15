@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Project Flow - Test Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .radio-group,
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .radio-group label,
+        .checkbox-group label {
+            display: inline;
+            font-weight: normal;
+        }
+
+        .radio-group input,
+        .checkbox-group input {
+            width: auto;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #submitBtn {
+            margin-top: 10px;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="form-container">
+
+        <h1>Job Application Form</h1>
+
+
+        <!-- First Name -->
+      <div class="form-group">
+
+    <span>First Name</span>
+
+    <input
+        type="text"
+        id="random_456"
+        name="random_field"
+        placeholder=""
+    >
+
+</div>
+
+
+        <!-- Last Name -->
+        <div class="form-group">
+
+            <label for="candidate_last_name">
+                Last Name
+            </label>
+
+            <input
+                type="text"
+                id="candidate_last_name"
+                name="surname"
+                placeholder="Enter your last name"
+            >
+
+        </div>
+
+
+        <!-- Email -->
+        <div class="form-group">
+
+            <label for="candidate_email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="candidate_email"
+                name="email_address"
+                placeholder="Enter your email"
+            >
+
+        </div>
+
+
+        <!-- Phone -->
+        <div class="form-group">
+
+            <label for="candidate_phone">
+                Mobile Number
+            </label>
+
+            <input
+                type="tel"
+                id="candidate_phone"
+                name="mobile"
+                placeholder="Enter your mobile number"
+            >
+
+        </div>
+
+
+        <!-- Address -->
+        <div class="form-group">
+
+            <label for="streetAddress">
+                Residential Address
+            </label>
+
+            <textarea
+                id="streetAddress"
+                name="residential_address"
+                placeholder="Enter your address"
+            ></textarea>
+
+        </div>
+
+
+        <!-- City -->
+        <div class="form-group">
+
+            <label for="candidate_city">
+                City
+            </label>
+
+            <input
+                type="text"
+                id="candidate_city"
+                name="town"
+                placeholder="Enter your city"
+            >
+
+        </div>
+
+
+        <!-- State -->
+        <div class="form-group">
+
+            <label for="candidate_state">
+                State
+            </label>
+
+            <input
+                type="text"
+                id="candidate_state"
+                name="province"
+                placeholder="Enter your state"
+            >
+
+        </div>
+
+
+        <!-- Pincode -->
+        <div class="form-group">
+
+            <label for="postal">
+                Postal Code
+            </label>
+
+            <input
+                type="text"
+                id="postal"
+                name="postal_code"
+                placeholder="Enter your pincode"
+            >
+
+        </div>
+
+
+        <!-- LinkedIn -->
+        <div class="form-group">
+
+            <label for="linkedin_profile">
+                LinkedIn Profile
+            </label>
+
+            <input
+                type="text"
+                id="linkedin_profile"
+                name="linkedin_url"
+                placeholder="LinkedIn URL"
+            >
+
+        </div>
+
+
+        <!-- GitHub -->
+        <div class="form-group">
+
+            <label for="github_profile">
+                GitHub Profile
+            </label>
+
+            <input
+                type="text"
+                id="github_profile"
+                name="github_url"
+                placeholder="GitHub URL"
+            >
+
+        </div>
+
+
+        <!-- Gender -->
+        <div class="form-group">
+
+            <label>
+                Gender
+            </label>
+
+            <div class="radio-group">
+
+                <div>
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="Male"
+                        id="male"
+                    >
+
+                    <label for="male">
+                        Male
+                    </label>
+                </div>
+
+
+                <div>
+                    <input
+                        type="radio"
+                        name="gender"
+                        value="Female"
+                        id="female"
+                    >
+
+                    <label for="female">
+                        Female
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Experience -->
+        <div class="form-group">
+
+            <label for="work_experience">
+                Years of Experience
+            </label>
+
+            <select
+                id="work_experience"
+                name="experience"
+            >
+
+                <option value="">
+                    Select Experience
+                </option>
+
+                <option value="0">
+                    0 Years
+                </option>
+
+                <option value="1">
+                    1 Year
+                </option>
+
+                <option value="2">
+                    2 Years
+                </option>
+
+                <option value="3">
+                    3 Years
+                </option>
+
+                <option value="4">
+                    4 Years
+                </option>
+
+                <option value="5">
+                    5 Years
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Notice Period -->
+        <div class="form-group">
+
+            <label for="notice_period">
+                Notice Period
+            </label>
+
+            <select
+                id="notice_period"
+                name="noticePeriod"
+            >
+
+                <option value="">
+                    Select Notice Period
+                </option>
+
+                <option value="Immediate">
+                    Immediate
+                </option>
+
+                <option value="15">
+                    15 Days
+                </option>
+
+                <option value="30">
+                    30 Days
+                </option>
+
+                <option value="60">
+                    60 Days
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Relocation -->
+        <div class="form-group">
+
+            <label>
+                Willing to Relocate?
+            </label>
+
+            <div class="radio-group">
+
+                <div>
+                    <input
+                        type="radio"
+                        name="relocate"
+                        value="Yes"
+                        id="relocateYes"
+                    >
+
+                    <label for="relocateYes">
+                        Yes
+                    </label>
+                </div>
+
+
+                <div>
+                    <input
+                        type="radio"
+                        name="relocate"
+                        value="No"
+                        id="relocateNo"
+                    >
+
+                    <label for="relocateNo">
+                        No
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Terms -->
+        <div class="form-group">
+
+            <div class="checkbox-group">
+
+                <input
+                    type="checkbox"
+                    id="terms"
+                    name="terms"
+                >
+
+                <label for="terms">
+                    I agree to the terms and conditions
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <!-- Submit -->
+        <button
+            type="button"
+            id="submitBtn"
+        >
+            Submit Application
+        </button>
+
+
+        <div id="result">
+            Form submitted successfully!
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const submitBtn =
+            document.getElementById("submitBtn");
+
+        const result =
+            document.getElementById("result");
+
+
+        submitBtn.addEventListener("click", () => {
+
+            result.style.display = "block";
+
+            result.textContent =
+                "Form submitted successfully!";
+
+        });
+
+    </script>
+
+</body>
+
+</html>
