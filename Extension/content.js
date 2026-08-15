@@ -245,23 +245,37 @@ function matchFieldAlias(text) {
 
 
 
-function getNearbyText(input) {
-  let text = "";
 
-  const parent = input.parentElement;
+function detectNearbyLabel(input) {
+  if (!input) return "";
 
-  if (parent) {
-    text += " " + (parent.innerText || "");
+  let current = input.parentElement;
+
+  for (let i = 0; i < 3 && current; i++) {
+
+    // Look for label
+    const label = current.querySelector("label");
+
+    if (label) {
+      return label.innerText.trim();
+    }
+
+    // Look for common label elements
+    const labelElement = current.querySelector(
+      ".field-label, .form-label, .label"
+    );
+
+    if (labelElement) {
+      return labelElement.innerText.trim();
+    }
+
+    current = current.parentElement;
   }
 
-  const grandParent = parent?.parentElement;
-
-  if (grandParent) {
-    text += " " + (grandParent.innerText || "");
-  }
-
-  return text;
+  return "";
 }
+
+
 
 function detectField(input) {
   const name = (input.name || "").toLowerCase();
@@ -270,7 +284,8 @@ function detectField(input) {
   const placeholder = input.placeholder || "";
   const ariaLabel = input.getAttribute("aria-label") || "";
   const autocomplete = input.getAttribute("autocomplete") || "";
-  const nearbyText = getNearbyText(input);
+
+ 
 
   // =================================
   // RADIO: RELOCATE
@@ -323,7 +338,8 @@ function detectField(input) {
         ${ariaLabel}
         ${autocomplete}
         ${labelText}
-        ${nearbyText}
+      
+      
     `
     .toLowerCase()
     .trim();
@@ -340,6 +356,34 @@ function detectField(input) {
   labelText
 });
 
+
+
+
+
+
+
+// =================================
+// NEARBY SEMANTIC LABEL
+// =================================
+
+const nearbyLabel = detectNearbyLabel(input);
+
+if (nearbyLabel) {
+
+  const nearbyField = matchFieldAlias(nearbyLabel);
+
+  if (nearbyField) {
+
+    console.log(
+      "Nearby Label Match:",
+      nearbyLabel,
+      "→",
+      nearbyField
+    );
+
+    return nearbyField;
+  }
+}
 
   // =================================
 // PHASE 2: UNIVERSAL ALIAS MATCHING
