@@ -3,10 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Project Flow - Test Form</title>
+
+    <link rel="icon" href="data:,">
 
     <style>
         body {
@@ -76,14 +77,11 @@
         button {
             width: 100%;
             padding: 12px;
+            margin-top: 10px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-        }
-
-        #submitBtn {
-            margin-top: 10px;
         }
 
         #result {
@@ -96,35 +94,28 @@
     </style>
 </head>
 
-
 <body>
 
     <div class="form-container">
 
         <h1>Job Application Form</h1>
 
-
         <!-- First Name -->
-<div class="form-group">
+        <div class="form-group">
+            <label for="first_name">
+                First Name
+            </label>
 
-    <div class="field-label">
-        First Name
-    </div>
-
-    <div class="input-wrapper">
-
-        <input
-            id="random_789"
-        >
-
-    </div>
-
-</div>
-
+            <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                placeholder="Enter your first name"
+            >
+        </div>
 
         <!-- Last Name -->
         <div class="form-group">
-
             <label for="candidate_last_name">
                 Last Name
             </label>
@@ -135,13 +126,10 @@
                 name="surname"
                 placeholder="Enter your last name"
             >
-
         </div>
-
 
         <!-- Email -->
         <div class="form-group">
-
             <label for="candidate_email">
                 Email Address
             </label>
@@ -152,13 +140,10 @@
                 name="email_address"
                 placeholder="Enter your email"
             >
-
         </div>
-
 
         <!-- Phone -->
         <div class="form-group">
-
             <label for="candidate_phone">
                 Mobile Number
             </label>
@@ -169,13 +154,10 @@
                 name="mobile"
                 placeholder="Enter your mobile number"
             >
-
         </div>
-
 
         <!-- Address -->
         <div class="form-group">
-
             <label for="streetAddress">
                 Residential Address
             </label>
@@ -185,13 +167,10 @@
                 name="residential_address"
                 placeholder="Enter your address"
             ></textarea>
-
         </div>
-
 
         <!-- City -->
         <div class="form-group">
-
             <label for="candidate_city">
                 City
             </label>
@@ -202,13 +181,10 @@
                 name="town"
                 placeholder="Enter your city"
             >
-
         </div>
-
 
         <!-- State -->
         <div class="form-group">
-
             <label for="candidate_state">
                 State
             </label>
@@ -219,13 +195,10 @@
                 name="province"
                 placeholder="Enter your state"
             >
-
         </div>
-
 
         <!-- Pincode -->
         <div class="form-group">
-
             <label for="postal">
                 Postal Code
             </label>
@@ -236,13 +209,10 @@
                 name="postal_code"
                 placeholder="Enter your pincode"
             >
-
         </div>
-
 
         <!-- LinkedIn -->
         <div class="form-group">
-
             <label for="linkedin_profile">
                 LinkedIn Profile
             </label>
@@ -253,13 +223,10 @@
                 name="linkedin_url"
                 placeholder="LinkedIn URL"
             >
-
         </div>
-
 
         <!-- GitHub -->
         <div class="form-group">
-
             <label for="github_profile">
                 GitHub Profile
             </label>
@@ -270,9 +237,7 @@
                 name="github_url"
                 placeholder="GitHub URL"
             >
-
         </div>
-
 
         <!-- Gender -->
         <div class="form-group">
@@ -296,7 +261,6 @@
                     </label>
                 </div>
 
-
                 <div>
                     <input
                         type="radio"
@@ -311,9 +275,7 @@
                 </div>
 
             </div>
-
         </div>
-
 
         <!-- Experience -->
         <div class="form-group">
@@ -356,9 +318,7 @@
                 </option>
 
             </select>
-
         </div>
-
 
         <!-- Notice Period -->
         <div class="form-group">
@@ -393,9 +353,7 @@
                 </option>
 
             </select>
-
         </div>
-
 
         <!-- Relocation -->
         <div class="form-group">
@@ -419,7 +377,6 @@
                     </label>
                 </div>
 
-
                 <div>
                     <input
                         type="radio"
@@ -434,9 +391,7 @@
                 </div>
 
             </div>
-
         </div>
-
 
         <!-- Terms -->
         <div class="form-group">
@@ -454,9 +409,22 @@
                 </label>
 
             </div>
-
         </div>
 
+        <!-- Dynamic Field Buttons -->
+        <button
+            type="button"
+            id="addFieldBtn"
+        >
+            Add Dynamic Field
+        </button>
+
+        <button
+            type="button"
+            id="removeFieldBtn"
+        >
+            Remove Dynamic Field
+        </button>
 
         <!-- Submit -->
         <button
@@ -466,22 +434,21 @@
             Submit Application
         </button>
 
-
+        <!-- Result -->
         <div id="result">
             Form submitted successfully!
         </div>
 
     </div>
 
-
     <script>
 
-        const submitBtn =
-            document.getElementById("submitBtn");
+        // =====================================
+        // SUBMIT BUTTON
+        // =====================================
 
-        const result =
-            document.getElementById("result");
-
+        const submitBtn = document.getElementById("submitBtn");
+        const result = document.getElementById("result");
 
         submitBtn.addEventListener("click", () => {
 
@@ -492,6 +459,63 @@
 
         });
 
+
+        // =====================================
+        // ADD DYNAMIC FIELD
+        // =====================================
+
+        const addFieldBtn =
+            document.getElementById("addFieldBtn");
+
+     addFieldBtn.addEventListener("click", () => {
+
+    const container = document.createElement("div");
+
+    container.className = "form-group";
+
+    const uniqueId =
+        "dynamic_first_name_" + Date.now();
+
+    container.innerHTML = `
+        <label for="${uniqueId}">
+            Dynamic First Name
+        </label>
+
+        <input
+            type="text"
+            id="${uniqueId}"
+            name="dynamic_field_123"
+            placeholder=""
+        >
+    `;
+
+    document
+        .querySelector(".form-container")
+        .appendChild(container);
+});
+
+        // =====================================
+        // REMOVE DYNAMIC FIELD
+        // =====================================
+
+        const removeFieldBtn =
+            document.getElementById("removeFieldBtn");
+
+       removeFieldBtn.addEventListener("click", () => {
+
+    const dynamicFields =
+        document.querySelectorAll(
+            'input[name="dynamic_field_123"]'
+        );
+
+    if (dynamicFields.length > 0) {
+
+        const lastField =
+            dynamicFields[dynamicFields.length - 1];
+
+        lastField.parentElement.remove();
+    }
+});
     </script>
 
 </body>

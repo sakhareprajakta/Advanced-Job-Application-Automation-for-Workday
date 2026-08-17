@@ -1,35 +1,9 @@
-function getProfile() {
-  return new Promise((resolve) => {
-    const fields = [
-      "firstName",
-      "lastName",
-      "email",
-      "phone",
-      "address",
-      "city",
-      "state",
-      "pincode",
-      "linkedin",
-      "github",
 
-      // New fields
-      "gender",
-      "experience",
-      "noticePeriod",
-      "relocate",
-      "terms",
-    ];
-
-    chrome.storage.local.get(fields, (data) => {
-      console.log("Project Flow Profile:", data);
-
-      resolve(data);
-    });
-  });
-}
 
 function fillInput(input, value) {
-  if (!input || !value) return;
+  if (!input || value === undefined || value === null) {
+    return;
+  }
 
   const nativeSetter = Object.getOwnPropertyDescriptor(
     HTMLInputElement.prototype,
@@ -41,6 +15,10 @@ function fillInput(input, value) {
     "value",
   )?.set;
 
+  //  Tell Project Flow this is programmatic filling
+  
+  input.dataset.projectFlowFilling = "true";
+
   if (input.tagName === "TEXTAREA" && textareaSetter) {
     textareaSetter.call(input, value);
   } else if (nativeSetter) {
@@ -49,7 +27,6 @@ function fillInput(input, value) {
     input.value = value;
   }
 
-  // React / Angular / normal website events
   input.dispatchEvent(
     new Event("input", {
       bubbles: true,
@@ -62,188 +39,210 @@ function fillInput(input, value) {
     }),
   );
 
-  input.dispatchEvent(
-    new Event("blur", {
-      bubbles: true,
-    }),
-  );
+  // Remove filling flag after events are completed
+  setTimeout(() => {
+    delete input.dataset.projectFlowFilling;
+  }, 500);
 }
 
 
+function trackUserInput(input) {
+  if (!input) return;
+
+  if (input.dataset.projectFlowTracked === "true") {
+    return;
+  }
+
+  input.dataset.projectFlowTracked = "true";
+
+  input.addEventListener("input", () => {
+    //  Ignore Project Flow generated event
+    if (input.dataset.projectFlowFilling === "true") {
+      return;
+    }
+
+    userModifiedFields.add(input);
+
+    const field = detectField(input);
+
+    if (field) {
+      const stableKey = getStableFieldKey(input, field);
+
+      protectedStableFields.add(stableKey);
+    }
+
+    console.log("Project Flow: USER MODIFIED → PROTECTED", input.value);
+  });
+
+  input.addEventListener("change", () => {
+    //  Ignore Project Flow generated event
+    if (input.dataset.projectFlowFilling === "true") {
+      return;
+    }
+
+    userModifiedFields.add(input);
+
+    const field = detectField(input);
+
+    if (field) {
+      const stableKey = getStableFieldKey(input, field);
+
+      protectedStableFields.add(stableKey);
+    }
+
+    console.log("Project Flow: USER CHANGED → PROTECTED", input.value);
+  });
+}
 
 const fieldAliases = {
+  firstName: [
+    "firstname",
+    "first_name",
+    "fname",
+    "givenname",
+    "given_name",
+    "candidatefirstname",
+    "candidate_first_name",
+    "applicantfirstname",
+    "applicant_first_name",
+  ],
 
-    firstName: [
-        "firstname",
-        "first_name",
-        "fname",
-        "givenname",
-        "given_name",
-        "candidatefirstname",
-        "candidate_first_name",
-        "applicantfirstname",
-        "applicant_first_name"
-    ],
+  lastName: [
+    "lastname",
+    "last_name",
+    "lname",
+    "surname",
+    "familyname",
+    "family_name",
+    "candidate_last_name",
+    "applicant_last_name",
+  ],
 
-    lastName: [
-        "lastname",
-        "last_name",
-        "lname",
-        "surname",
-        "familyname",
-        "family_name",
-        "candidate_last_name",
-        "applicant_last_name"
-    ],
+  email: [
+    "email",
+    "emailaddress",
+    "email_address",
+    "mail",
+    "candidateemail",
+    "candidate_email",
+    "applicantemail",
+  ],
 
-    email: [
-        "email",
-        "emailaddress",
-        "email_address",
-        "mail",
-        "candidateemail",
-        "candidate_email",
-        "applicantemail"
-    ],
+  phone: [
+    "phone",
+    "phonenumber",
+    "phone_number",
+    "mobile",
+    "mobilenumber",
+    "mobile_number",
+    "contact",
+    "contactnumber",
+    "contact_number",
+    "telephone",
+    "tel",
+  ],
 
-    phone: [
-        "phone",
-        "phonenumber",
-        "phone_number",
-        "mobile",
-        "mobilenumber",
-        "mobile_number",
-        "contact",
-        "contactnumber",
-        "contact_number",
-        "telephone",
-        "tel"
-    ],
+  address: [
+    "address",
+    "street",
+    "streetaddress",
+    "street_address",
+    "residentialaddress",
+    "residential_address",
+    "homeaddress",
+    "home_address",
+  ],
 
-    address: [
-        "address",
-        "street",
-        "streetaddress",
-        "street_address",
-        "residentialaddress",
-        "residential_address",
-        "homeaddress",
-        "home_address"
-    ],
+  city: ["city", "town", "district"],
 
-    city: [
-        "city",
-        "town",
-        "district"
-    ],
+  state: ["state", "province", "region"],
 
-    state: [
-        "state",
-        "province",
-        "region"
-    ],
+  pincode: [
+    "pincode",
+    "pin",
 
-    pincode: [
-        "pincode",
-        "pin",
-       
-        "pincode_number",
-        "postalcode",
-        "postal_code",
-        "zipcode",
-        "zip_code",
-        "zip"
-    ],
+    "pincode_number",
+    "postalcode",
+    "postal_code",
+    "zipcode",
+    "zip_code",
+    "zip",
+  ],
 
-    linkedin: [
-        "linkedin",
-        "linkedinurl",
-        "linkedin_url",
-        "linkedinprofile",
-        "linkedin_profile"
-    ],
+  linkedin: [
+    "linkedin",
+    "linkedinurl",
+    "linkedin_url",
+    "linkedinprofile",
+    "linkedin_profile",
+  ],
 
-    github: [
-        "github",
-        "githuburl",
-        "github_url",
-        "githubprofile",
-        "github_profile"
-    ],
+  github: [
+    "github",
+    "githuburl",
+    "github_url",
+    "githubprofile",
+    "github_profile",
+  ],
 
-    gender: [
-        "gender",
-        "sex"
-    ],
+  gender: ["gender", "sex"],
 
-    experience: [
-        "experience",
-        "workexperience",
-        "work_experience",
-        "yearsofexperience",
-        "years_of_experience",
-        "totalexperience",
-        "total_experience"
-    ],
+  experience: [
+    "experience",
+    "workexperience",
+    "work_experience",
+    "yearsofexperience",
+    "years_of_experience",
+    "totalexperience",
+    "total_experience",
+  ],
 
-    noticePeriod: [
-        "noticeperiod",
-        "notice_period",
-        "notice",
-        "noticeperioddays"
-    ],
+  noticePeriod: ["noticeperiod", "notice_period", "notice", "noticeperioddays"],
 
-    relocate: [
-        "relocate",
-        "relocation",
-        "willingtorelocate",
-        "willing_to_relocate"
-    ],
+  relocate: [
+    "relocate",
+    "relocation",
+    "willingtorelocate",
+    "willing_to_relocate",
+  ],
 
-    terms: [
-        "terms",
-        "agreement",
-        "agree",
-        "termsandconditions",
-        "terms_and_conditions"
-    ]
+  terms: [
+    "terms",
+    "agreement",
+    "agree",
+    "termsandconditions",
+    "terms_and_conditions",
+  ],
 };
 
 function normalizeFieldText(text) {
-
-    return String(text || "")
-        .toLowerCase()
-        .replace(/[\s_-]+/g, "")
-        .trim();
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "")
+    .trim();
 }
 
 
 function matchFieldAlias(text) {
+  const normalizedText = normalizeFieldText(text);
 
-    const normalizedText = normalizeFieldText(text);
+  for (const field in fieldAliases) {
+    const aliases = fieldAliases[field];
 
-    for (const field in fieldAliases) {
+    for (const alias of aliases) {
+      const normalizedAlias = normalizeFieldText(alias);
 
-        const aliases = fieldAliases[field];
-
-        for (const alias of aliases) {
-
-            const normalizedAlias =
-                normalizeFieldText(alias);
-
-            if (
-                normalizedText === normalizedAlias ||
-                normalizedText.includes(normalizedAlias)
-            ) {
-                return field;
-            }
-        }
+      if (
+        normalizedText === normalizedAlias ||
+        normalizedText.includes(normalizedAlias)
+      ) {
+        return field;
+      }
     }
+  }
 
-    return null;
+  return null;
 }
-
-
 
 
 function detectNearbyLabel(input) {
@@ -252,7 +251,6 @@ function detectNearbyLabel(input) {
   let current = input.parentElement;
 
   for (let i = 0; i < 3 && current; i++) {
-
     // Look for label
     const label = current.querySelector("label");
 
@@ -262,7 +260,7 @@ function detectNearbyLabel(input) {
 
     // Look for common label elements
     const labelElement = current.querySelector(
-      ".field-label, .form-label, .label"
+      ".field-label, .form-label, .label",
     );
 
     if (labelElement) {
@@ -275,8 +273,6 @@ function detectNearbyLabel(input) {
   return "";
 }
 
-
-
 function detectField(input) {
   const name = (input.name || "").toLowerCase();
   const id = (input.id || "").toLowerCase();
@@ -284,8 +280,6 @@ function detectField(input) {
   const placeholder = input.placeholder || "";
   const ariaLabel = input.getAttribute("aria-label") || "";
   const autocomplete = input.getAttribute("autocomplete") || "";
-
- 
 
   // =================================
   // RADIO: RELOCATE
@@ -309,10 +303,6 @@ function detectField(input) {
     return "terms";
   }
 
-  // const name = input.name || "";
-  // const id = input.id || "";
-  
-
   // Find associated label
   let labelText = "";
 
@@ -331,7 +321,7 @@ function detectField(input) {
     labelText += " " + (parentLabel.innerText || "");
   }
 
- const text = `
+  const text = `
         ${name}
         ${id}
         ${placeholder}
@@ -347,60 +337,42 @@ function detectField(input) {
   console.log("Checking field:", input, "→", text);
 
   console.log("FIELD DATA:", {
-  name,
-  id,
-  type: input.type,
-  placeholder,
-  ariaLabel,
-  autocomplete,
-  labelText
-});
-
-
-
-
-
-
-
-// =================================
-// NEARBY SEMANTIC LABEL
-// =================================
-
-const nearbyLabel = detectNearbyLabel(input);
-
-if (nearbyLabel) {
-
-  const nearbyField = matchFieldAlias(nearbyLabel);
-
-  if (nearbyField) {
-
-    console.log(
-      "Nearby Label Match:",
-      nearbyLabel,
-      "→",
-      nearbyField
-    );
-
-    return nearbyField;
-  }
-}
+    name,
+    id,
+    type: input.type,
+    placeholder,
+    ariaLabel,
+    autocomplete,
+    labelText,
+  });
 
   // =================================
-// PHASE 2: UNIVERSAL ALIAS MATCHING
-// =================================
+  // NEARBY SEMANTIC LABEL
+  // =================================
 
-const aliasResult = matchFieldAlias(text);
+  const nearbyLabel = detectNearbyLabel(input);
 
-if (aliasResult) {
-  console.log(
-    "Universal Alias Match:",
-    text,
-    "→",
-    aliasResult
-  );
+  if (nearbyLabel) {
+    const nearbyField = matchFieldAlias(nearbyLabel);
 
-  return aliasResult;
-}
+    if (nearbyField) {
+      console.log("Nearby Label Match:", nearbyLabel, "→", nearbyField);
+
+      return nearbyField;
+    }
+  }
+
+  // =================================
+  // PHASE 2: UNIVERSAL ALIAS MATCHING
+  // =================================
+
+  const aliasResult = matchFieldAlias(text);
+
+  if (aliasResult) {
+    console.log("Universal Alias Match:", text, "→", aliasResult);
+
+    return aliasResult;
+  }
 
   // =========================
   // FIRST NAME
@@ -600,9 +572,9 @@ function fillRadioGroup(name, value) {
     const label = document.querySelector(`label[for="${radio.id}"]`);
 
     const radioText = `
-            ${radio.value || ""}
-            ${label ? label.innerText : ""}
-        `
+      ${radio.value || ""}
+      ${label ? label.innerText : ""}
+    `
       .toLowerCase()
       .trim();
 
@@ -610,6 +582,8 @@ function fillRadioGroup(name, value) {
       radioText === value.toLowerCase() ||
       radioText.includes(value.toLowerCase())
     ) {
+      radio.dataset.projectFlowFilling = "true";
+
       radio.checked = true;
 
       radio.dispatchEvent(
@@ -618,13 +592,17 @@ function fillRadioGroup(name, value) {
         }),
       );
 
+      setTimeout(() => {
+        delete radio.dataset.projectFlowFilling;
+      }, 500);
+
       console.log("Radio filled:", value);
     }
   });
 }
 
 function fillSelect(select, value) {
-  if (!select || value === undefined) {
+  if (!select || value === undefined || value === null) {
     return;
   }
 
@@ -637,25 +615,33 @@ function fillSelect(select, value) {
     );
   });
 
-  if (option) {
-    select.value = option.value;
-
-    select.dispatchEvent(
-      new Event("change", {
-        bubbles: true,
-      }),
-    );
-
-    select.dispatchEvent(
-      new Event("input", {
-        bubbles: true,
-      }),
-    );
-
-    console.log("Dropdown filled:", option.textContent.trim());
-  } else {
+  if (!option) {
     console.log("Dropdown option NOT found:", value);
+
+    return;
   }
+
+  select.dataset.projectFlowFilling = "true";
+
+  select.value = option.value;
+
+  select.dispatchEvent(
+    new Event("change", {
+      bubbles: true,
+    }),
+  );
+
+  select.dispatchEvent(
+    new Event("input", {
+      bubbles: true,
+    }),
+  );
+
+  setTimeout(() => {
+    delete select.dataset.projectFlowFilling;
+  }, 500);
+
+  console.log("Dropdown filled:", option.textContent.trim());
 }
 
 function fillCheckbox(input, value) {
@@ -668,108 +654,316 @@ function fillCheckbox(input, value) {
     value === "checked";
 
   if (input.checked !== shouldCheck) {
+    input.dataset.projectFlowFilling = "true";
+
     input.click();
+
+    setTimeout(() => {
+      delete input.dataset.projectFlowFilling;
+    }, 500);
 
     console.log("Checkbox filled:", shouldCheck);
   }
 }
 
-async function autofillForm() {
+
+
+// =====================================
+// FIELD PROCESSING CONTROL
+// =====================================
+const processedFields = new WeakSet();
+
+const processedStableFields = new Set();
+const protectedStableFields = new Set();
+
+const protectedFieldTypes = new Set();
+
+const userModifiedFields = new WeakSet();
+
+let isProjectFlowFilling = false;
+
+function getFieldIdentifier(input) {
+  if (!input) return "";
+
+  return (
+    input.name ||
+    input.id ||
+    input.getAttribute("data-testid") ||
+    input.getAttribute("aria-label") ||
+    ""
+  ).toLowerCase();
+}
+
+// =====================================
+// STABLE FIELD KEY
+// =====================================
+
+function getStableFieldKey(input, field) {
+  if (!input) return "";
+
+  const name = input.name || "";
+  const id = input.id || "";
+
+  return `${field || "unknown"}|${name}|${id}`;
+}
+
+function shouldFillField(input, field) {
+  if (!input) return false;
+
+  // =====================================
+  // 1. SAME DOM ELEMENT ALREADY PROCESSED
+  // =====================================
+
+  if (processedFields.has(input)) {
+    console.log("Skipping duplicate field:", input);
+    return false;
+  }
+
+  // =====================================
+  // 2. USER / PAGE ALREADY HAS VALUE
+  // =====================================
+
+  if (input.value && input.value.trim() !== "") {
+    console.log("Skipping pre-filled field:", field, "VALUE:", input.value);
+
+    // Protect this field type
+    if (field) {
+      protectedFieldTypes.add(field);
+    }
+
+    processedFields.add(input);
+
+    return false;
+  }
+
+  // =====================================
+  // 3. SAME FIELD TYPE WAS ALREADY
+  //    PROTECTED BY USER DATA
+  // =====================================
+
+  if (field && protectedFieldTypes.has(field)) {
+    console.log("Skipping protected field type:", field);
+
+    processedFields.add(input);
+
+    return false;
+  }
+
+  return true;
+}
+
+function markFieldProcessed(input) {
+  if (input) {
+    processedFields.add(input);
+  }
+}
+
+autofillForm();
+
+// =====================================
+// STAGE 6A: OPTIMIZED DYNAMIC FIELD
+// PROCESSING
+// =====================================
+
+let dynamicTimer = null;
+
+function processNewNode(node) {
+  // Ignore non-element nodes
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return;
+  }
+
+  // =====================================
+  // 1. NODE ITSELF IS A FORM FIELD
+  // =====================================
+
+  if (node.matches("input, textarea, select")) {
+    processSingleField(node);
+  }
+
+  // =====================================
+  // 2. NODE CONTAINS NEW FORM FIELDS
+  // =====================================
+
+  const fields = node.querySelectorAll("input, textarea, select");
+
+  fields.forEach((field) => {
+    processSingleField(field);
+  });
+}
+
+async function processSingleField(input) {
+  if (!input) return;
+
+  // =====================================
+  // TRACK USER INPUT
+  // =====================================
+
+  trackUserInput(input);
+
+  // =====================================
+  // DETECT FIELD
+  // =====================================
+
+  const field = detectField(input);
+
+  if (!field) {
+    console.log("Project Flow: Unable to detect new field");
+
+    return;
+  }
+
+  // =====================================
+  // STABLE FIELD KEY
+  // =====================================
+
+  const stableKey = getStableFieldKey(input, field);
+
+  // =====================================
+  // USER MODIFIED EXACT ELEMENT
+  // =====================================
+
+  if (userModifiedFields.has(input)) {
+    console.log("Project Flow: USER PROTECTED → SKIP", field, input.value);
+
+    return;
+  }
+
+  // =====================================
+  // USER PROTECTED STABLE FIELD
+  // =====================================
+
+  if (protectedStableFields.has(stableKey)) {
+    console.log("Project Flow: STABLE FIELD PROTECTED → SKIP", stableKey);
+
+    return;
+  }
+
+  // =====================================
+  // EXISTING VALUE
+  // =====================================
+
+  if (input.value && input.value.trim() !== "") {
+    console.log("Project Flow: Existing value → SKIP", field, input.value);
+
+    return;
+  }
+
+  // =====================================
+  // GET PROFILE
+  // =====================================
+
   const profile = await getProfile();
 
-  console.log("Project Flow Profile:", profile);
+  const value = profile[field];
 
   // =====================================
-  // INPUT + TEXTAREA
+  // NO PROFILE VALUE
   // =====================================
 
-  const inputs = document.querySelectorAll(
-    "input:not([type='radio']):not([type='checkbox']), textarea",
-  );
+  if (value === undefined || value === null || value === "") {
+    console.log("Project Flow: No profile value:", field);
 
-  inputs.forEach((input) => {
-    const field = detectField(input);
-
-    if (field && profile[field] !== undefined) {
-      console.log(`Filling ${field}:`, profile[field]);
-
-      fillInput(input, profile[field]);
-    }
-  });
+    return;
+  }
 
   // =====================================
-  // SELECT / DROPDOWN
+  // MARK PROCESSED
   // =====================================
 
-  const selects = document.querySelectorAll("select");
+  processedFields.add(input);
 
-  selects.forEach((select) => {
-    const field = detectField(select);
+  console.log("Project Flow: NEW dynamic field detected:", field, input);
 
-    console.log(
-      "SELECT DETECTED:",
-      field,
-      "VALUE:",
-      field ? profile[field] : undefined,
-    );
+  // =====================================
+  // INPUT / TEXTAREA
+  // =====================================
 
-    if (field && profile[field] !== undefined && profile[field] !== "") {
-      fillSelect(select, profile[field]);
-    }
-  });
+  if (
+    input.matches("input:not([type='radio']):not([type='checkbox']), textarea")
+  ) {
+    console.log(`Project Flow: Dynamic fill ${field}:`, value);
+
+    fillInput(input, value);
+
+    return;
+  }
+
+  // =====================================
+  // SELECT
+  // =====================================
+
+  if (input.matches("select")) {
+    console.log(`Project Flow: Dynamic dropdown ${field}:`, value);
+
+    fillSelect(input, value);
+
+    return;
+  }
 
   // =====================================
   // RADIO
   // =====================================
 
-  const radios = document.querySelectorAll("input[type='radio']");
-
-  const processedGroups = new Set();
-
-  radios.forEach((radio) => {
-    const field = detectField(radio);
-
-    console.log(
-      "RADIO DETECTED:",
-      field,
-      "VALUE:",
-      field ? profile[field] : undefined,
-    );
-
-    if (
-      field &&
-      profile[field] !== undefined &&
-      radio.name &&
-      !processedGroups.has(radio.name)
-    ) {
-      processedGroups.add(radio.name);
-
-      fillRadioGroup(radio.name, profile[field]);
+  if (input.matches("input[type='radio']")) {
+    if (input.name) {
+      fillRadioGroup(input.name, value);
     }
-  });
+
+    return;
+  }
 
   // =====================================
   // CHECKBOX
   // =====================================
 
-  const checkboxes = document.querySelectorAll("input[type='checkbox']");
+  if (input.matches("input[type='checkbox']")) {
+    fillCheckbox(input, value);
 
-  checkboxes.forEach((checkbox) => {
-    const field = detectField(checkbox);
-
-    console.log(
-      "CHECKBOX DETECTED:",
-      field,
-      "VALUE:",
-      field ? profile[field] : undefined,
-    );
-
-    if (field && profile[field] !== undefined) {
-      fillCheckbox(checkbox, profile[field]);
-    }
-  });
-
-  console.log("Project Flow: Form Control Engine completed");
+    return;
+  }
 }
 
-autofillForm();
+// =====================================
+// MUTATION OBSERVER
+// =====================================
+const observer = new MutationObserver((mutations) => {
+  clearTimeout(dynamicTimer);
+
+  dynamicTimer = setTimeout(() => {
+    console.log("Project Flow: DOM changed → collecting ONLY new fields");
+
+    const newFields = new Set();
+
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+          return;
+        }
+
+        // If added node itself is a field
+        if (node.matches("input, textarea, select")) {
+          newFields.add(node);
+        }
+
+        // If added node contains fields
+        node.querySelectorAll("input, textarea, select").forEach((field) => {
+          newFields.add(field);
+        });
+      });
+    });
+
+    console.log("Project Flow: New unique fields:", newFields.size);
+
+    newFields.forEach((field) => {
+      processSingleField(field);
+    });
+  }, 300);
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+console.log("Project Flow: Optimized Dynamic Observer started");
