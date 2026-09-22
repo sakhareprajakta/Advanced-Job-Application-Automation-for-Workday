@@ -1,4 +1,4 @@
-::: {align="center"}
+
 
 🚀 Advanced Job Application Automation for Workday
 
@@ -6,16 +6,6 @@
 
 Detect • Understand • Map • Autofill • Observe • Protect
 
-<br>{=html}
-
-
-
-
-
-
-
-
-<br>{=html}
 
 💡 A real-world browser automation project that intelligently
 detects job-application fields instead of depending only on fixed HTML
