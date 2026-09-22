@@ -1,6 +1,24 @@
-@"
+# Dependencies
 node_modules/
+
+# Environment variables
 .env
 .env.*
 !.env.example
-"@ | Set-Content .gitignore
+
+# NPM cache
+.npm-cache/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# Editor
+.vscode/

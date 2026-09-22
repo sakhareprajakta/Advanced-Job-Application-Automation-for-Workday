@@ -3,12 +3,18 @@
 
     "name": "Project Flow",
 
-    "version": "1.0",
+    "version": "1.1",
 
     "description": "Automatic form autofill extension",
 
     "permissions": [
-        "storage"
+        "storage",
+        "activeTab",
+        "tabs"
+    ],
+
+    "host_permissions": [
+        "http://localhost:8000/*"
     ],
 
     "action": {
@@ -22,10 +28,13 @@
     "content_scripts": [
         {
             "matches": [
-                "http://127.0.0.1:5500/*"
+                "http://127.0.0.1:5500/*",
+                "https://*.myworkdayjobs.com/*",
+                "https://*.workday.com/*"
             ],
            "js": [
     "profileApi.js",
+     "fieldDitector.js",
     "content.js"
 ]
         }

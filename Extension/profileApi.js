@@ -1,5 +1,4 @@
 
-let savedProfile = {};
 async function autofillForm() {
 
   console.log("🔥 AUTOFILL FORM STARTED");
@@ -20,6 +19,14 @@ async function autofillForm() {
     trackUserInput(input);
 
     const field = detectField(input);
+    console.log(
+  "PROJECT FLOW MAPPING:",
+  input.id,
+  "→",
+  field,
+  "→",
+  profile[field]
+);
 
     if (!field) {
       console.log("Project Flow: Unable to detect new field");
@@ -55,7 +62,7 @@ async function autofillForm() {
       return;
     }
 
-    if (profile[field] !== undefined) {
+    if (profile[field] !== undefined && profile[field] !== "") {
       console.log(`Filling ${field}:`, profile[field]);
 
       fillInput(input, profile[field]);
@@ -78,7 +85,12 @@ async function autofillForm() {
       field ? profile[field] : undefined,
     );
 
-    if (field && profile[field] !== undefined && profile[field] !== "") {
+    if (
+      field &&
+      profile[field] !== undefined &&
+      profile[field] !== "" &&
+      !select.value
+    ) {
       fillSelect(select, profile[field]);
     }
   });
@@ -104,6 +116,7 @@ async function autofillForm() {
     if (
       field &&
       profile[field] !== undefined &&
+      !radio.checked &&
       radio.name &&
       !processedGroups.has(radio.name)
     ) {
@@ -129,7 +142,14 @@ async function autofillForm() {
       field ? profile[field] : undefined,
     );
 
-    if (field && profile[field] !== undefined) {
+    // Agreement/terms checkboxes require an explicit user action. Never
+    // accept them automatically on the user's behalf.
+    if (
+      field &&
+      field !== "terms" &&
+      profile[field] !== undefined &&
+      !checkbox.checked
+    ) {
       fillCheckbox(checkbox, profile[field]);
     }
   });
@@ -138,37 +158,17 @@ async function autofillForm() {
 }
 
 
-async function loadProfileFromAPI() {
-
-  console.log("🔥 API FUNCTION STARTED");
-
-  try {
-    const response = await fetch(
-      "http://localhost:5000/api/profile"
-    );
-
-    console.log("🔥 API STATUS:", response.status);
-
-    const profile = await response.json();
-
-    console.log("🔥 API PROFILE:", profile);
-
-    savedProfile = profile;
-
-    return profile;
-
-  } catch (error) {
-    console.error("🔥 API ERROR:", error);
-    return null;
-  }
-}
-
-
-
-
-
 function getProfile() {
-  console.log("🔥 GET PROFILE CALLED");
-  return loadProfileFromAPI();
+  return new Promise((resolve) => {
+    chrome.storage.local.get(null, (profile) => {
+      if (chrome.runtime.lastError) {
+        console.error("Project Flow: unable to read the saved profile", chrome.runtime.lastError);
+        resolve({});
+        return;
+      }
+
+      resolve(profile);
+    });
+  });
 }
 

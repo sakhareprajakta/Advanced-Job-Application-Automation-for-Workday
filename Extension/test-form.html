@@ -156,6 +156,9 @@
             >
         </div>
 
+
+
+
         <!-- Address -->
         <div class="form-group">
             <label for="streetAddress">
@@ -276,6 +279,75 @@
 
             </div>
         </div>
+    
+     <hr>
+
+<strong>Education 1</strong>
+
+<div class="form-group">
+    <label for="school">School or University</label>
+    <input
+        type="text"
+        id="school"
+        placeholder="e.g. Savitribai Phule Pune University"
+    >
+</div>
+
+<div class="form-group">
+    <label for="degree">Degree</label>
+    <input
+        type="text"
+        id="degree"
+        placeholder="e.g. Bachelor of Engineering"
+    >
+</div>
+
+<div class="form-group">
+    <label for="fieldOfStudy">Field of Study</label>
+    <input
+        type="text"
+        id="fieldOfStudy"
+        placeholder="e.g. Computer Engineering"
+    >
+</div>
+
+<div class="form-group">
+    <label for="gpa">Overall Result (GPA)</label>
+    <input
+        type="text"
+        id="gpa"
+        placeholder="e.g. 8.5"
+    >
+</div>
+
+<div class="form-group">
+    <label for="educationFrom">Education From</label>
+    <input
+        type="text"
+        id="educationFrom"
+        placeholder="YYYY"
+    >
+</div>
+
+<div class="form-group">
+    <label for="educationTo">Education To</label>
+    <input
+        type="text"
+        id="educationTo"
+        placeholder="YYYY"
+    >
+</div>
+
+<div class="form-group">
+    <label for="skills">Skills</label>
+    <input
+        type="text"
+        id="skills"
+        placeholder="e.g. React, JavaScript, Node.js"
+    >
+</div>
+
+
 
         <!-- Experience -->
         <div class="form-group">
@@ -411,6 +483,33 @@
             </div>
         </div>
 
+
+        <div id="step2" style="display: none;">
+
+<h3>Step 2 - Additional Information</h3>
+
+<label for="jobTitle">Job Title</label>
+<input
+  type="text"
+  id="jobTitle"
+  placeholder="Enter your job title"
+/>
+
+<label for="company">Company</label>
+<input
+  type="text"
+  id="company"
+  placeholder="Enter your company"
+/>
+
+<label for="workLocation">Work Location</label>
+<input
+  type="text"
+  id="workLocation"
+  placeholder="Enter work location"
+/>
+
+</div>
         <!-- Dynamic Field Buttons -->
         <button
             type="button"
@@ -425,6 +524,8 @@
         >
             Remove Dynamic Field
         </button>
+
+        <button type="button" id="nextBtn">Next</button>
 
         <!-- Submit -->
         <button
@@ -517,6 +618,16 @@
     }
 });
     </script>
+
+<script>
+  document.getElementById("nextBtn").addEventListener("click", function () {
+    document.getElementById("step2").style.display = "block";
+    this.style.display = "none";
+
+    console.log("TEST FORM: Step 2 loaded");
+  });
+</script>
+
 
 </body>
 

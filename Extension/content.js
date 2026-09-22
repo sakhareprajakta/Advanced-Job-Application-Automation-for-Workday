@@ -94,126 +94,7 @@ function trackUserInput(input) {
   });
 }
 
-const fieldAliases = {
-  firstName: [
-    "firstname",
-    "first_name",
-    "fname",
-    "givenname",
-    "given_name",
-    "candidatefirstname",
-    "candidate_first_name",
-    "applicantfirstname",
-    "applicant_first_name",
-  ],
 
-  lastName: [
-    "lastname",
-    "last_name",
-    "lname",
-    "surname",
-    "familyname",
-    "family_name",
-    "candidate_last_name",
-    "applicant_last_name",
-  ],
-
-  email: [
-    "email",
-    "emailaddress",
-    "email_address",
-    "mail",
-    "candidateemail",
-    "candidate_email",
-    "applicantemail",
-  ],
-
-  phone: [
-    "phone",
-    "phonenumber",
-    "phone_number",
-    "mobile",
-    "mobilenumber",
-    "mobile_number",
-    "contact",
-    "contactnumber",
-    "contact_number",
-    "telephone",
-    "tel",
-  ],
-
-  address: [
-    "address",
-    "street",
-    "streetaddress",
-    "street_address",
-    "residentialaddress",
-    "residential_address",
-    "homeaddress",
-    "home_address",
-  ],
-
-  city: ["city", "town", "district"],
-
-  state: ["state", "province", "region"],
-
-  pincode: [
-    "pincode",
-    "pin",
-
-    "pincode_number",
-    "postalcode",
-    "postal_code",
-    "zipcode",
-    "zip_code",
-    "zip",
-  ],
-
-  linkedin: [
-    "linkedin",
-    "linkedinurl",
-    "linkedin_url",
-    "linkedinprofile",
-    "linkedin_profile",
-  ],
-
-  github: [
-    "github",
-    "githuburl",
-    "github_url",
-    "githubprofile",
-    "github_profile",
-  ],
-
-  gender: ["gender", "sex"],
-
-  experience: [
-    "experience",
-    "workexperience",
-    "work_experience",
-    "yearsofexperience",
-    "years_of_experience",
-    "totalexperience",
-    "total_experience",
-  ],
-
-  noticePeriod: ["noticeperiod", "notice_period", "notice", "noticeperioddays"],
-
-  relocate: [
-    "relocate",
-    "relocation",
-    "willingtorelocate",
-    "willing_to_relocate",
-  ],
-
-  terms: [
-    "terms",
-    "agreement",
-    "agree",
-    "termsandconditions",
-    "terms_and_conditions",
-  ],
-};
 
 function normalizeFieldText(text) {
   return String(text || "")
@@ -271,6 +152,20 @@ function detectNearbyLabel(input) {
   }
 
   return "";
+}
+
+function isInEducationSection(input) {
+  let current = input?.parentElement;
+
+  for (let i = 0; i < 6 && current; i++) {
+    const sectionText = `${current.getAttribute("data-automation-id") || ""} ${current.innerText || ""}`.toLowerCase();
+
+    if (sectionText.includes("education")) return true;
+
+    current = current.parentElement;
+  }
+
+  return false;
 }
 
 function detectField(input) {
@@ -353,14 +248,85 @@ function detectField(input) {
   const nearbyLabel = detectNearbyLabel(input);
 
   if (nearbyLabel) {
+    // Workday's Work Experience section often gives every child input an
+    // internal name containing "experience". Handle its visible child labels
+    // first so the years-of-experience value is never written into job data.
+    const normalizedNearbyLabel = normalizeFieldText(nearbyLabel);
+
+    if (
+      normalizedNearbyLabel.includes("jobtitle") ||
+      normalizedNearbyLabel.includes("positiontitle") ||
+      normalizedNearbyLabel.includes("role")
+    ) {
+      return "jobTitle";
+    }
+
+    if (normalizedNearbyLabel.includes("company") || normalizedNearbyLabel.includes("employer")) {
+      return "company";
+    }
+
+    if (normalizedNearbyLabel.includes("location")) {
+      return "workLocation";
+    }
+
+    if (normalizedNearbyLabel.includes("school") || normalizedNearbyLabel.includes("university")) {
+      return "school";
+    }
+
+    if (normalizedNearbyLabel === "degree") {
+      return "degree";
+    }
+
+    if (normalizedNearbyLabel.includes("fieldofstudy")) {
+      return "fieldOfStudy";
+    }
+
+    if (normalizedNearbyLabel.includes("overallresult") || normalizedNearbyLabel.includes("gpa")) {
+      return "gpa";
+    }
+
+    if (normalizedNearbyLabel.includes("typetoaddskills") || normalizedNearbyLabel === "skills") {
+      return "skills";
+    }
+
+    if (normalizedNearbyLabel === "from" || normalizedNearbyLabel.includes("startdate")) {
+      return isInEducationSection(input) ? "educationFrom" : "startDate";
+    }
+
+    if (normalizedNearbyLabel === "to" || normalizedNearbyLabel.includes("enddate")) {
+      return isInEducationSection(input) ? "educationTo" : "endDate";
+    }
+
+// Direct ID mapping for education fields
+if (text.includes("educationfrom")) {
+  return "educationFrom";
+}
+
+if (text.includes("educationto")) {
+  return "educationTo";
+}
+
+// then your existing code continues
     const nearbyField = matchFieldAlias(nearbyLabel);
 
     if (nearbyField) {
+      
       console.log("Nearby Label Match:", nearbyLabel, "→", nearbyField);
 
       return nearbyField;
     }
   }
+
+  // Workday may expose the purpose through id/name rather than a label.
+  if (text.includes("jobtitle") || text.includes("positiontitle")) return "jobTitle";
+  if (text.includes("company") || text.includes("employer")) return "company";
+  if (text.includes("worklocation")) return "workLocation";
+  if (text.includes("school") || text.includes("university")) return "school";
+  if (text.includes("fieldofstudy")) return "fieldOfStudy";
+  if (text.includes("overallresult") || text.includes("gpa")) return "gpa";
+  if (text.includes("typetoaddskills") || text.includes("skills")) return "skills";
+  if (text.includes("startdate")) return "startDate";
+  if (text.includes("enddate")) return "endDate";
 
   // =================================
   // PHASE 2: UNIVERSAL ALIAS MATCHING
@@ -647,11 +613,12 @@ function fillSelect(select, value) {
 function fillCheckbox(input, value) {
   if (!input || !value) return;
 
+  const normalizedValue = String(value).trim().toLowerCase();
   const shouldCheck =
     value === true ||
-    value === "true" ||
-    value === "yes" ||
-    value === "checked";
+    normalizedValue === "true" ||
+    normalizedValue === "yes" ||
+    normalizedValue === "checked";
 
   if (input.checked !== shouldCheck) {
     input.dataset.projectFlowFilling = "true";
@@ -967,3 +934,54 @@ observer.observe(document.body, {
 });
 
 console.log("Project Flow: Optimized Dynamic Observer started");
+
+function getButtonText(button) {
+  return `${button.innerText || ""} ${button.value || ""} ${button.getAttribute("aria-label") || ""}`
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function findSafeNextStepButton() {
+  const buttons = document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]');
+
+  return Array.from(buttons).find((button) => {
+    if (button.disabled || button.getAttribute("aria-disabled") === "true") {
+      return false;
+    }
+
+    const text = getButtonText(button);
+    const isNextStep = /\b(next|continue|save and continue)\b/.test(text);
+    const isFinalAction = /\b(submit|apply|complete application|finish)\b/.test(text);
+
+    return isNextStep && !isFinalAction;
+  });
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === "PROJECT_FLOW_FILL_PAGE") {
+    autofillForm()
+      .then(() => sendResponse({ message: "Fill request completed. Review the values before continuing." }))
+      .catch((error) => {
+        console.error("Project Flow: manual fill failed", error);
+        sendResponse({ message: "Unable to fill this page. Check that a profile was saved." });
+      });
+    return true;
+  }
+
+  if (message?.type !== "PROJECT_FLOW_NEXT_STEP") {
+    return;
+  }
+
+  const nextButton = findSafeNextStepButton();
+
+  if (!nextButton) {
+    sendResponse({
+      message: "No safe Next/Continue button was found. Final Submit buttons are intentionally blocked.",
+    });
+    return;
+  }
+
+  nextButton.click();
+  sendResponse({ message: "Moving to the next step. New fields will be filled after the page loads." });
+});

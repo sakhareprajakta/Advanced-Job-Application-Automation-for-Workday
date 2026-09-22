@@ -48,6 +48,17 @@
 
     <h2>Project Flow</h2>
 
+    <label for="resume">Upload Resume (PDF or DOCX)</label>
+    <input type="file" id="resume" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+    <button id="parseResumeBtn" type="button">Extract Resume Details</button>
+    <p id="resumeMessage"></p>
+    <div id="resumeReview" hidden>
+        <strong>Resume Review</strong>
+        <p id="skillsReview"></p>
+        <p id="educationReview"></p>
+        <p id="experienceReview"></p>
+    </div>
+
     <label>First Name</label>
     <input type="text" id="firstName">
 
@@ -100,6 +111,13 @@
     <option value="1">1 Year</option>
     <option value="2">2 Years</option>
     <option value="3">3 Years</option>
+    <option value="4">4 Years</option>
+    <option value="5">5 Years</option>
+    <option value="6">6 Years</option>
+    <option value="7">7 Years</option>
+    <option value="8">8 Years</option>
+    <option value="9">9 Years</option>
+    <option value="10">10+ Years</option>
 </select>
 
 
@@ -112,6 +130,49 @@
     <option value="30">30 Days</option>
     <option value="60">60 Days</option>
 </select>
+
+<hr>
+<strong>Work Experience 1</strong>
+<p>Add the details exactly as they appear on your resume.</p>
+
+<label>Job Title</label>
+<input type="text" id="jobTitle" placeholder="e.g. Software Developer">
+
+<label>Company</label>
+<input type="text" id="company" placeholder="e.g. ABC Technologies">
+
+<label>Work Location</label>
+<input type="text" id="workLocation" placeholder="e.g. Pune, Maharashtra">
+
+<label>From</label>
+<input type="text" id="startDate" placeholder="MM/YYYY">
+
+<label>To</label>
+<input type="text" id="endDate" placeholder="MM/YYYY">
+
+<hr>
+<strong>Education 1</strong>
+
+<label>School or University</label>
+<input type="text" id="school" placeholder="e.g. Savitribai Phule Pune University">
+
+<label>Degree</label>
+<input type="text" id="degree" placeholder="e.g. Bachelor of Engineering">
+
+<label>Field of Study</label>
+<input type="text" id="fieldOfStudy" placeholder="e.g. Computer Engineering">
+
+<label>Overall Result (GPA)</label>
+<input type="text" id="gpa" placeholder="e.g. 8.5">
+
+<label>Education From</label>
+<input type="text" id="educationFrom" placeholder="YYYY">
+
+<label>Education To</label>
+<input type="text" id="educationTo" placeholder="YYYY">
+
+<label>Skills</label>
+<input type="text" id="skills" placeholder="e.g. React, JavaScript, Node.js">
 
 
 <label>Willing to Relocate</label>
@@ -128,6 +189,14 @@
     Agree to Terms
 </label>
     <button id="saveBtn">Save Profile</button>
+    <button id="fillPageBtn" type="button">Fill This Page</button>
+    <p id="fillMessage"></p>
+
+    <hr>
+    <strong>Application Step Review</strong>
+    <p>Check the filled values on the application page before continuing.</p>
+    <button id="nextStepBtn" type="button">Review Complete — Next Step</button>
+    <p id="navigationMessage"></p>
 
     <p id="message"></p>
 
