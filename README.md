@@ -1,52 +1,128 @@
-Advanced Job Application Automation for Workday
+::: {align="center"}
 
-A Chrome Extension--based automation project designed to intelligently
-detect, map, and autofill complex job application forms, with a focus
-on Workday's dynamic, multi-step application experience.
+🚀 Advanced Job Application Automation for Workday
+
+🤖 Smart Chrome Extension for Dynamic Job Application Forms
+
+Detect • Understand • Map • Autofill • Observe • Protect
+
+<br>{=html}
 
 
 
-1. Project Overview
 
-Advanced Job Application Automation for Workday is a
-browser-extension project that reduces repetitive manual work while
-completing job applications.
 
-Workday applications can contain dynamically rendered fields, different
-labels for the same information, dropdowns, radio buttons, checkboxes,
-conditional sections, and multi-step pages.
 
-Instead of depending only on fixed selectors, the project uses a
-field-detection and mapping approach.
 
-DOM Information
-      ↓
-Field Detection
-      ↓
-Canonical Field Name
-      ↓
-Profile Data
-      ↓
-Form Control
-      ↓
-Autofill
 
-Example:
+<br>{=html}
 
-"Given Name"              → firstName
-"Family Name"             → lastName
-"Email Address"            → email
-"Mobile Number"            → phone
-"Postal Code"              → pincode
-"Years of Experience"      → experience
+💡 A real-world browser automation project that intelligently
+detects job-application fields instead of depending only on fixed HTML
+selectors.
+:::
 
-2. Problem I Solved
+📌 Table of Contents
 
-A simple autofill script may depend on a fixed selector:
+🎯 Project Overview
+
+💡 Problem Statement
+
+✨ Key Features
+
+🧠 How the Automation Works
+
+🔎 Smart Field Detection
+
+⚡ Dynamic Field Handling
+
+🛡️ User Override Protection
+
+🏗️ Architecture
+
+📁 Project Structure
+
+🔄 Complete Project Flow
+
+🧪 Testing
+
+🖥️ Live Demo
+
+📸 Screenshots
+
+🛠️ Technology Stack
+
+🚀 Setup
+
+🎤 Interview Explanation
+
+🔮 Future Improvements
+
+🔐 Privacy & Safety
+
+👩‍💻 Author
+
+🎯 Project Overview
+
+Advanced Job Application Automation for Workday is a Chrome
+Extension-based automation system created to reduce repetitive work
+while filling complex job-application forms.
+
+Modern application platforms can contain:
+
+🔄 Dynamically rendered fields
+
+🏷️ Different labels for the same information
+
+🔽 Dropdowns
+
+🔘 Radio buttons
+
+☑️ Checkboxes
+
+🧩 Conditional sections
+
+📄 Multi-step application flows
+
+⚡ Fields that appear after user interaction
+
+The project solves this by creating a field-detection → mapping →
+autofill pipeline.
+
+⭐ Core Idea
+
+┌─────────────────────┐
+│   Web Application   │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│   Detect DOM Field  │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│ Normalize / Alias   │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│ Canonical Field Key │
+│ firstName / email   │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│ Candidate Profile   │
+└──────────┬──────────┘
+           ↓
+┌─────────────────────┐
+│     Autofill        │
+└─────────────────────┘
+
+💡 Problem Statement
+
+A basic autofill script might depend on:
 
 <input id="firstName">
 
-But the same logical field can later appear as:
+But another application may use:
 
 <input name="candidateFirstName">
 
@@ -54,239 +130,378 @@ or:
 
 <input aria-label="Given Name">
 
-The project therefore reads multiple signals:
+All three represent the same business field.
+
+❌ Fragile approach
+
+#firstName
+#email
+#phone
+
+If the website changes the ID, the automation can break.
+
+✅ Project approach
+
+The extension checks multiple signals:
+
+DOM Signal       Example
+
+name           candidateFirstName
+id             first_name
+placeholder    Enter your first name
+aria-label     Given Name
+autocomplete   given-name
+Label text       First Name
+
+These signals are normalized and mapped to a common profile key.
+
+✨ Key Features
+
+Feature                             What it does
+
+🧠 Smart field detection            Identifies fields using multiple
+DOM signals
+
+🔗 Alias matching                   Maps different field names to one
+profile key
+
+✍️ Text autofill                    Fills input and textarea controls
+
+🔽 Dropdown support                 Selects matching options
+
+🔘 Radio support                    Selects the correct radio option
+
+☑️ Checkbox support                 Handles agreement/terms fields
+
+⚡ Dynamic DOM support              Detects newly rendered fields
+
+👤 User-input tracking              Protects manually edited values
+
+🔄 Re-processing                    Handles fields added again later
+
+🧪 Local test environment           Tests automation without depending
+on a live application
+
+🌐 API layer                        Connects extension profile data
+with backend services
+
+🧠 How the Automation Works
+
+Example
+
+Suppose the webpage contains:
+
+<input
+    name="candidateFirstName"
+    aria-label="Given Name"
+/>
+
+The extension processes it like this:
+
+candidateFirstName
+        +
+Given Name
+        ↓
+Field Detection
+        ↓
+Alias Matching
+        ↓
+firstName
+        ↓
+profile.firstName
+        ↓
+"Prajakta"
+        ↓
+Input Filled
+
+In simple words
+
+The extension does not simply ask "What is the ID of this field?" It
+asks "What information is this field requesting?"
+
+That is the main engineering idea behind the project.
+
+🔎 Smart Field Detection
+
+The detector collects information from:
 
 name
-
 id
-
+value
 placeholder
-
 aria-label
-
 autocomplete
+associated label
+parent label
 
-associated label text
+Example mappings
 
-These signals are normalized and mapped to a standard internal profile
-key.
+Website may say          Internal key
 
-3. Main Features
+First Name               firstName
+Given Name               firstName
+Candidate First Name     firstName
+Family Name              lastName
+Surname                  lastName
+Email Address            email
+Mobile Number            phone
+Telephone                phone
+Street Address           address
+City / Town              city
+Province / Region        state
+Postal Code / ZIP Code   pincode
+LinkedIn Profile         linkedin
+GitHub Profile           github
+Years of Experience      experience
+Notice Period            noticePeriod
+Willing to Relocate      relocate
 
-Core automation
+Normalization concept
 
-Chrome Extension using Manifest V3
+For example:
 
-Profile-based autofill
+Candidate_First_Name
+candidate-first-name
+Candidate First Name
+candidateFirstName
 
-Automatic field detection
+can be normalized so that different naming styles can be recognized as
+the same logical field.
 
-Universal field alias matching
+⚡ Dynamic Field Handling
 
-Text input and textarea handling
+This is one of the most important technical parts of the project.
 
-Dropdown/select handling
+Modern web applications often create fields after the initial page
+load.
 
-Radio button handling
+Without dynamic observation
 
-Checkbox handling
+Page loads
+   ↓
+Scan fields
+   ↓
+Done ❌
 
-LinkedIn and GitHub autofill
+A field added later may be missed.
 
-Experience and notice-period mapping
+With MutationObserver
 
-Relocation and gender mapping
-
-Terms/agreement checkbox handling
-
-Dynamic form handling
-
-The extension uses MutationObserver.
-
-DOM changes
-    ↓
-MutationObserver
-    ↓
-New fields collected
-    ↓
-Field detection
-    ↓
+Page loads
+   ↓
+Initial field scan
+   ↓
+User interacts with page
+   ↓
+New DOM element appears
+   ↓
+MutationObserver detects it
+   ↓
+processSingleField()
+   ↓
+detectField()
+   ↓
 Profile mapping
-    ↓
+   ↓
 Autofill
 
-This allows newly rendered controls to be processed without a page
-refresh.
+Why I used MutationObserver
 
-4. User Override Protection
+MutationObserver lets the extension react to DOM changes without
+repeatedly refreshing or continuously scanning the entire page.
 
-The extension tracks manual user changes.
+🛡️ User Override Protection
+
+Automation should not fight with the user.
 
 Example:
 
 Extension fills:
 First Name = Prajakta
 
-User changes it:
+        ↓
+
+User manually changes:
 First Name = Rohit
 
-DOM changes again
+        ↓
 
-The manually changed value remains protected instead of being blindly
-overwritten.
+Another DOM change occurs
 
-5. Dynamic Field Reliability
+        ↓
 
-The project was tested for:
+Automation checks user interaction
 
-Add dynamic field
-      ↓
+        ↓
+
+Rohit remains unchanged ✅
+
+This is handled using user-input tracking.
+
+Interview point
+
+"I wanted the automation to remain user-controlled, so I added logic
+to distinguish extension-generated values from values intentionally
+changed by the user."
+
+🔄 Dynamic Add / Remove / Re-add Test
+
+The automation was tested against this scenario:
+
+Add Dynamic Field
+        ↓
+Detect Field
+        ↓
 Autofill
-      ↓
-Remove field
-      ↓
-Add same logical field again
-      ↓
-Autofill again
+        ↓
+Remove Field
+        ↓
+Add Field Again
+        ↓
+Detect Again
+        ↓
+Autofill Again
 
-The observer also collects newly added elements in a Set so the same
-DOM element is not unnecessarily processed multiple times during a
-mutation batch.
+This helps validate that the automation is not limited to a one-time
+page scan.
 
-6. Universal Field Detection
+🏗️ Architecture
 
-Examples:
+flowchart TD
+    A[Job Application Page] --> B[Chrome Extension]
+    B --> C[content.js]
+    C --> D[DOM Field Detection]
+    C --> E[Alias Matching]
+    C --> F[MutationObserver]
 
-Website Field          Internal Key
+    D --> G[Canonical Field Key]
+    E --> G
+    F --> D
 
-First Name             firstName
-Given Name             firstName
-Candidate First Name   firstName
-Family Name            lastName
-Surname                lastName
-Email Address          email
-Mobile Number          phone
-Street Address         address
-City                   city
-Province               state
-Postal Code            pincode
-LinkedIn Profile       linkedin
-GitHub Profile         github
-Years of Experience    experience
-Notice Period          noticePeriod
-Willing to Relocate    relocate
+    G --> H[Candidate Profile]
+    H --> I[Form Control]
 
-7. Architecture
+    J[React Popup] --> K[Profile Management]
+    K --> L[REST API]
+    L --> M[Node.js + Express]
+    M --> N[(MongoDB / MySQL)]
+    H -. API / Storage .-> K
 
-                         ┌─────────────────────────┐
-                         │       Job Website       │
-                         │   Workday / Test Form   │
-                         └────────────┬────────────┘
-                                      │
-                                      ▼
-                         ┌─────────────────────────┐
-                         │      Chrome Extension   │
-                         │       content.js        │
-                         └────────────┬────────────┘
-                                      │
-                 ┌────────────────────┼────────────────────┐
-                 │                    │                    │
-                 ▼                    ▼                    ▼
-          Field Detection      Alias Matching      MutationObserver
-                 │                    │                    │
-                 └────────────────────┼────────────────────┘
-                                      ▼
-                         ┌─────────────────────────┐
-                         │   Canonical Field Key   │
-                         │ firstName / email / ... │
-                         └────────────┬────────────┘
-                                      │
-                                      ▼
-                         ┌─────────────────────────┐
-                         │      Profile Data       │
-                         │ Chrome Storage / API    │
-                         └────────────┬────────────┘
-                                      │
-                                      ▼
-                         ┌─────────────────────────┐
-                         │     Form Control        │
-                         │ input/select/radio/etc. │
-                         └─────────────────────────┘
+Architecture in simple language
 
-8. Project Structure
+React Popup
+     ↓
+Profile
+     ↓
+API / Storage
+     ↓
+Chrome Extension
+     ↓
+content.js
+     ↓
+Field Detection
+     ↓
+Alias Mapping
+     ↓
+Autofill
+     ↓
+Dynamic Observation
+
+📁 Project Structure
 
 WorkdayAutomation/
 │
-├── Backend/
-│   ├── Server.js
-│   ├── models/
-│   │   └── Profile.js
-│   ├── package.json
-│   └── package-lock.json
+├── 📂 Backend/
+│   ├── 📄 Server.js
+│   ├── 📂 models/
+│   │   └── 📄 Profile.js
+│   ├── 📄 package.json
+│   └── 📄 package-lock.json
 │
-├── Extension/
-│   ├── content.js
-│   ├── fieldDitector.js
-│   ├── manifest.json
-│   ├── popup.html
-│   ├── popup.js
-│   ├── profileApi.js
-│   └── test-form.html
+├── 📂 Extension/
+│   ├── 📄 content.js
+│   ├── 📄 fieldDitector.js
+│   ├── 📄 manifest.json
+│   ├── 📄 popup.html
+│   ├── 📄 popup.js
+│   ├── 📄 profileApi.js
+│   └── 📄 test-form.html
 │
-├── popup/
-│   ├── src/
-│   │   └── App.jsx
+├── 📂 popup/
+│   ├── 📂 src/
+│   │   └── ⚛️ App.jsx
 │   └── ...
 │
-├── docs/
-│   └── screenshots/
+├── 📂 docs/
+│   └── 📂 screenshots/
+│       ├── 🖼️ 01-extension-popup.png
+│       ├── 🖼️ 02-test-form-before.png
+│       ├── 🖼️ 03-autofill-result.png
+│       ├── 🖼️ 04-dynamic-field.png
+│       ├── 🖼️ 05-user-override.png
+│       ├── 🖼️ 06-console.png
+│       └── 🖼️ 07-content-engine.png
 │
-├── .gitignore
-└── README.md
+├── 📄 .gitignore
+└── 📄 README.md
 
-9. File Responsibilities
+🧩 Major File Responsibilities
 
 Extension/manifest.json
 
-Defines the Chrome Extension configuration, permissions, content scripts
-and page matching rules.
+Defines the Chrome Extension configuration:
+
+Manifest V3
+
+Permissions
+
+Content scripts
+
+Page matching
+
+Extension resources
 
 Extension/content.js
 
-The core automation engine.
+🚨 Core automation engine
 
-It is responsible for:
+Responsible for:
 
-detecting form controls
+DOM scanning
 
-extracting field metadata
+Field detection
 
-mapping fields to profile keys
+Field mapping
 
-filling controls
+Autofill
 
-dropdown/radio/checkbox handling
+Dropdown handling
 
-tracking user changes
+Radio handling
 
-observing dynamically added fields
+Checkbox handling
 
-Important concepts/functions include:
+User-input tracking
+
+Dynamic field processing
+
+Important concepts:
 
 detectField()
 processSingleField()
 autofillForm()
 MutationObserver
 trackUserInput()
-alias matching
+Alias matching
 
 Extension/fieldDitector.js
 
-Contains field-detection logic as the project is being modularized.
+Contains field-detection-related logic as the project is being
+modularized.
 
 Extension/popup.html
 
-Extension popup UI.
+Provides the extension popup interface.
 
 Extension/popup.js
 
@@ -295,33 +510,48 @@ storage/API.
 
 Extension/profileApi.js
 
-API communication layer between the extension and backend profile
-services.
+Provides the API communication layer between the extension and backend
+profile services.
 
 Extension/test-form.html
 
-Local test environment for validating text fields, dropdowns, radio
-buttons, checkboxes, dynamic fields, remove/re-add behavior and user
-edits.
+🧪 Local testing environment.
+
+Used to test:
+
+Text inputs
+
+Textareas
+
+Dropdowns
+
+Radio buttons
+
+Checkboxes
+
+Dynamic fields
+
+Remove/re-add behavior
+
+User edits
 
 Backend/Server.js
 
-Node.js + Express backend entry point for profile-related APIs.
+Node.js + Express backend entry point for profile-related API
+functionality.
 
 Backend/models/Profile.js
 
-Profile data model.
+Defines the profile data model.
 
 popup/src/App.jsx
 
-React-based popup/dashboard layer for profile management and UI
+React-based popup/dashboard layer for profile management and future UI
 expansion.
 
-10. End-to-End Workflow
+🔄 Complete Project Flow
 
-Step 1 --- Profile
-
-The user provides profile information.
+1️⃣ User Profile
 
 {
   "firstName": "Prajakta",
@@ -334,33 +564,29 @@ The user provides profile information.
   "noticePeriod": "Immediate"
 }
 
-Step 2 --- Open job application
+2️⃣ Open application
 
-The content script runs on the application page.
-
-Workday Page
+Job Application
+      ↓
+Chrome Extension
       ↓
 content.js
 
-Step 3 --- Scan controls
+3️⃣ Scan controls
 
-The extension identifies:
+<input>
+<textarea>
+<select>
+<input type="radio">
+<input type="checkbox">
 
-input
-textarea
-select
-radio
-checkbox
-
-Step 4 --- Detect field
-
-Example:
+4️⃣ Detect field
 
 "Candidate First Name"
           ↓
        firstName
 
-Step 5 --- Retrieve value
+5️⃣ Retrieve profile value
 
 firstName
    ↓
@@ -368,128 +594,28 @@ profile.firstName
    ↓
 Prajakta
 
-Step 6 --- Fill control
+6️⃣ Fill the correct control
 
-Text Input       → set value
-Textarea         → set value
-Select           → select option
-Radio            → select radio
-Checkbox         → check/uncheck
+Text input  → Value
+Select      → Option
+Radio       → Choice
+Checkbox    → Checked state
 
-Relevant DOM events are dispatched so web applications can recognize
-programmatic changes.
-
-11. Dynamic DOM Workflow
-
-Suppose the page initially contains:
-
-First Name
-Last Name
-Email
-
-Later JavaScript adds:
-
-Phone
-
-The extension can react without a page reload:
-
-New DOM element
-      ↓
-MutationObserver
-      ↓
-processSingleField()
-      ↓
-detectField()
-      ↓
-Map profile value
-      ↓
-Autofill
-
-This is important because modern web applications often render controls
-asynchronously.
-
-12. Technology Stack
-
-Browser Automation
-
-Chrome Extension
-
-Manifest V3
-
-JavaScript
-
-DOM APIs
+7️⃣ Watch for new fields
 
 MutationObserver
+       ↓
+New field
+       ↓
+Process
+       ↓
+Detect
+       ↓
+Fill
 
-Frontend
+🧪 Testing
 
-React.js
-
-JavaScript
-
-Vite
-
-Backend
-
-Node.js
-
-Express.js
-
-REST APIs
-
-Data Layer
-
-MongoDB
-
-MySQL
-
-Development
-
-Git
-
-GitHub
-
-VS Code
-
-Chrome DevTools
-
-Postman
-
-13. AI / Intelligent Automation Direction
-
-The original assignment describes an AI-driven architecture involving
-resume parsing and semantic field mapping.
-
-The intended high-level flow is:
-
-Resume
-  ↓
-Resume Parsing
-  ↓
-Structured JSON
-  ↓
-Field Understanding
-  ↓
-Semantic Mapping
-  ↓
-Workday Autofill
-  ↓
-Review
-  ↓
-User Confirmation
-  ↓
-Submit
-
-Accuracy note: the currently verified core is focused on
-heuristic/alias-based field detection, dynamic DOM handling, reliable
-autofill and user protection. AI-based resume parsing/semantic mapping
-should only be described as implemented when that integration is
-actually enabled in the version being demonstrated.
-
-14. Testing
-
-The local test form covers:
+✅ Fields tested
 
 First Name
 
@@ -511,59 +637,28 @@ LinkedIn
 
 GitHub
 
-Experience dropdown
+Experience
 
-Notice Period dropdown
+Notice Period
 
-Gender radio buttons
+Gender
 
-Relocation radio buttons
+Relocation
 
-Terms checkbox
+Terms
 
-Dynamic tests:
+🔬 Dynamic tests
 
-Add → detect → autofill
-Remove → re-add → detect → autofill
+Add → Detect → Autofill
+Remove → Re-add → Detect → Autofill
 
-User-edit test:
+👤 User override test
 
-Extension: Prajakta
-User: Rohit
-Expected: Rohit remains unchanged
+Extension:
+Prajakta
 
-15. Run the Project
+User:
+Rohit
 
-Backend
-
-cd Backend
-npm install
-npm start
-
-Use the actual script in Backend/package.json if it differs.
-
-React popup
-
-cd popup
-npm install
-npm run dev
-
-Vite will provide a local URL such as:
-
-http://localhost:5173/
-
-Load the Chrome Extension
-
-Open Chrome.
-
-Go to chrome://extensions/.
-
-Enable Developer mode.
-
-Click Load unpacked.
-
-Select:
-
-WorkdayAutomation/Extension
-
-Pin the extension.
+Result:
+Rohit remains unchanged ✅
